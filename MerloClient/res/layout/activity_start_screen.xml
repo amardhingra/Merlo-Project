@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="6" >
+        android:layout_weight="1" >
 
         <ImageView
             android:id="@+id/logo"
@@ -35,8 +35,7 @@
         android:id="@+id/startButtons"
         style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="4"
+        android:layout_height="240dp"
         android:background="@android:color/white"
         android:orientation="vertical" >
 

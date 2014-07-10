@@ -14,30 +14,35 @@
     <string name="incorrect_username_password">Incorrect Username or Password</string>
     <string name="username_taken">Sorry that username has been taken</string>
     <string name="email_taken">An account already exists with that username</string>
-    <string name="forgot_password">Forgot your password?</string>
+    <string name="forgot_password"><u>Forgot your password?</u></string>
     <string name="logo">Logo</string>
-   
-    
     <string name="welcome_to_merlo">Welcome to Merlo</string>
     <string name="setup">Lets get you setup</string>
     <string name="next">Next</string>
-    
     <string name="basic_information">Lets start with your basic information</string>
     <string name="name">Name</string>
     <string name="address">Address</string>
     <string name="type">Type</string>
-    
     <string name="reward_list">List of rewards</string>
     <string name="plus">+</string>
+    <string name="login">Login</string>
+    <string name="complete_setup">Complete Setup</string>
     
+    <string name="free">Free</string>
+    <string name="with">with</string>
+    <string name="points">points</string>
+
     <string-array name="points">
         <item>5</item>
         <item>10</item>
         <item>15</item>
         <item>20</item>
     </string-array>
-    
+
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_setup">SetupActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_reward_screen">RewardScreen</string>
 
 </resources>

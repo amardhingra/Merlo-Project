@@ -25,11 +25,22 @@
         <activity
             android:name="com.example.merloclient.SetupActivity"
             android:label="@string/title_activity_setup"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
         </activity>
         <activity
             android:name="com.example.merloclient.LoginActivity"
             android:label="@string/title_activity_setup"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
+        </activity>
+        <activity
+            android:name="com.example.merloclient.RewardScreen"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_reward_screen"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
         </activity>
     </application>
