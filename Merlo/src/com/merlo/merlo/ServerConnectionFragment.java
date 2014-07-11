@@ -20,7 +20,7 @@ import android.util.Log;
 
 public class ServerConnectionFragment extends Fragment {
 
-	public final static String IPADDR = "192.168.61.206";
+	public final static String IPADDR = "192.168.1.44";
 	public final static int PORT = 2000;
 
 	private ServerCommunication serverCom;
@@ -116,6 +116,7 @@ public class ServerConnectionFragment extends Fragment {
 
 			this.messageType = messageType;
 			this.message = message;
+			
 		}
 
 		/**
@@ -143,8 +144,6 @@ public class ServerConnectionFragment extends Fragment {
 				output.println(messageType + "\n" + message);
 
 				String response = input.readLine();
-
-				Log.i("Response", response);
 
 				if (messageType.equals("SIGNUP")) {
 
