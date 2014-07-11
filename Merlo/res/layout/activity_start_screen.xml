@@ -1,0 +1,65 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/Merlo"
+    android:orientation="vertical"
+    tools:context="com.merlo.merlo.StartScreen" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:contentDescription="@string/logo"
+            android:src="@drawable/ic_launcher" />
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/actionButton"
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.8"
+        android:onClick="completeAction"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/startButtons"
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:background="@android:color/white"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/loginButton"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:alpha="0.8"
+            android:background="@color/Blue"
+            android:onClick="login"
+            android:text="@string/login" />
+
+        <Button
+            android:id="@+id/signupButton"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:alpha="0.8"
+            android:background="@color/Yellow"
+            android:onClick="signup"
+            android:text="@string/signup" />
+    </LinearLayout>
+
+</LinearLayout>
