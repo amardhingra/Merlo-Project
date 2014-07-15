@@ -10,9 +10,9 @@
 
     <ImageButton
         android:id="@+id/addImageButton"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:src="@drawable/ic_plus"
-        android:onClick="addRestaurant"/>
+        android:onClick="addCard"/>
 
 </LinearLayout>

@@ -15,9 +15,9 @@ public class StartScreen extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start_screen);
 		
-		loginPrefs = getSharedPreferences("LOGIN_PREFS", 0);
+		loginPrefs = getSharedPreferences(LoginPreferences.NAME, 0);
 		
-		if(loginPrefs.getBoolean("LOGGED_IN", false)){
+		if(loginPrefs.getBoolean(LoginPreferences.LOGGED_IN, false)){
 			
 			Intent mainActivity = new Intent(this, MainActivity.class);
 			startActivity(mainActivity);

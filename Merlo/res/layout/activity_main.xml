@@ -33,7 +33,7 @@
             android:background="@android:color/transparent" />
 
         <ImageButton
-            android:id="@+id/button_add_point"
+            android:id="@+id/button2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -41,7 +41,7 @@
             android:onClick = "addPoint" />
 
         <ImageButton
-            android:id="@+id/button_refresh"
+            android:id="@+id/button3"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -49,14 +49,14 @@
             android:onClick="refresh" />
 
         <ImageButton
-            android:id="@+id/ImageButton01"
+            android:id="@+id/button4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:src="@drawable/ic_launcher" />
 
         <ImageButton
-            android:id="@+id/imageButton1"
+            android:id="@+id/button5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

@@ -24,9 +24,8 @@ public class DisplayQRFragment extends DialogFragment {
 		
 		try {
 			qrImage.setImageBitmap(BitmapFactory
-					.decodeStream(getActivity().openFileInput("QRCODE.png")));
+					.decodeStream(getActivity().openFileInput("QR.png")));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
