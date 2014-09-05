@@ -18,13 +18,13 @@ public class HandleClient extends Thread {
 	Socket socket;
 	BufferedReader input;
 	PrintWriter output;
-	DBCollection users, sessionIDS, restaurants;
+	DBCollection users, sessionIDS, restaurants, cards;
 	MessageDigest hasher;
 	QRCodeWriter writer;
 	SessionID gen;
 
 	public HandleClient(Socket clientSocket, DBCollection usersDB,
-			DBCollection sessionIDSDB, DBCollection restDB, MessageDigest hash) {
+			DBCollection sessionIDSDB, DBCollection restDB, DBCollection cardsDB, MessageDigest hash) {
 
 		writer = new QRCodeWriter();
 
@@ -32,6 +32,7 @@ public class HandleClient extends Thread {
 		this.users = usersDB;
 		this.sessionIDS = sessionIDSDB;
 		this.restaurants = restDB;
+		this.cards = cardsDB;
 		this.hasher = hash;
 		gen = new SessionID();
 
@@ -77,21 +78,12 @@ public class HandleClient extends Thread {
 				String userID = getUniqueUserID();
 
 				saveSessionID(sessionID, username);
-
-				BasicDBObject newClient = new BasicDBObject();
-				newClient.put(Client.NAME, name);
-				newClient.put(Client.ADDRESS, address);
-				newClient.put(Client.TYPE, type);
-				newClient.put(Client.USERNAME, username);
-				newClient.put(Client.PASSWORD, password);
-				newClient.put(Client.EMAIL, email);
-				newClient.put(Client.REWARDS, rewards);
-				newClient.put(Client.SESSION_ID, sessionID);
-				newClient.put(Client.USER_ID, userID);
-
-				restaurants.insert(newClient);
+				
+				// TODO: parse rewards String to Rewards arraylist
+				restaurants.insert(new Client(name, address, type, username, password, email, null, userID));
 
 				output.write("OK\n" + sessionID);
+				output.flush();
 
 			} else if (option.equals("LOGIN")) {
 
@@ -120,9 +112,43 @@ public class HandleClient extends Thread {
 				} else {
 					output.write("INVALID\nUSERNAME");
 				}
+				output.flush();
 
 			}
+			
+			else if (option.equals("ADD_POINT")){
+				
+				String username = input.readLine();
+				String sessionID = input.readLine();
+				String userID = input.readLine();
+				
+				BasicDBObject cl = (BasicDBObject) restaurants.findOne(new BasicDBObject(Client.USERNAME, username));
+				
+				if(validateSessionID(sessionID, username)){
+					
+					BasicDBObject query = new BasicDBObject(Card.CLIENT_ID, cl.getString(Client.USER_ID));
+					query.put(Card.USER_ID, userID);
+					
+					System.out.println(query);
+					
+					BasicDBObject card = (BasicDBObject) cards.findAndRemove(query);
+					
+					System.out.println(card);
+					
+					card.put(Card.POINTS, card.getInt(Card.POINTS) + 1);
+					card.put(Card.LAST_VISITED, System.currentTimeMillis());
+					
+					cards.insert(card);
+					
+					output.write("OK\n");
+					output.flush();
+										
+				}
+				
+			}
 
+			System.out.println("Done\n");
+			output.flush();
 			socket.close();
 			
 		} catch (IOException e) {
@@ -167,6 +193,34 @@ public class HandleClient extends Thread {
 		sessionTok.put(Client.SESSION_TIME, System.currentTimeMillis());
 		sessionIDS.insert(sessionTok);
 
+	}
+	
+	private boolean validateSessionID(String sessionID, String username) {
+
+		BasicDBObject sessionToken = new BasicDBObject();
+		sessionToken.put(Client.SESSION_ID, sessionID);
+		sessionToken.put(Client.SESSION_USERNAME, username);
+
+		DBCursor sessionSearch = sessionIDS.find(sessionToken);
+
+		// checking for valid session ID
+		// make sure there is one entry
+		if (sessionSearch.count() == 1) {
+			BasicDBObject sessionTok = (BasicDBObject) sessionSearch.next();
+
+			// make sure time is less than Session timeout
+			if (System.currentTimeMillis()
+					- ((Long) sessionTok.get(Client.SESSION_TIME)) < Client.SESSION_TIME_OUT) {
+				// if all conditions are met we have a valid
+				// session id
+				return true;
+			} else {
+				// otherwise discard the saved session token
+				sessionIDS.remove(sessionTok);
+			}
+		}
+
+		return false;
 	}
 
 	private String hash(String toHash) {

@@ -18,7 +18,7 @@ public class StartScreen extends Activity {
 		// If they are already logged in skip all login/setup screens
 		if(setupPrefs.getBoolean("LOGGED_IN", false)){
 			
-			Intent mainScreen = new Intent(this, CameraTestActivity.class);
+			Intent mainScreen = new Intent(this, MainActivity.class);
 			startActivity(mainScreen);
 			overridePendingTransition(R.anim.animate_left_out,
 					R.anim.animate_right_in);

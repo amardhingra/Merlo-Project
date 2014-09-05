@@ -1142,8 +1142,8 @@ containing a value of this type.
         public static final int addressET=0x7f050055;
         public static final int always=0x7f05000b;
         public static final int beginning=0x7f050011;
-        public static final int button1=0x7f050052;
-        public static final int cameraFrame=0x7f05004a;
+        public static final int button1=0x7f05004a;
+        public static final int cameraFrame=0x7f050053;
         public static final int checkbox=0x7f05002d;
         public static final int collapseActionView=0x7f05000d;
         public static final int container=0x7f05003c;
@@ -1172,7 +1172,7 @@ containing a value of this type.
         public static final int nameET=0x7f050054;
         public static final int never=0x7f050009;
         public static final int new_user_button=0x7f05005b;
-        public static final int nextButton=0x7f050053;
+        public static final int nextButton=0x7f050052;
         public static final int none=0x7f050010;
         public static final int normal=0x7f050000;
         public static final int passwordET=0x7f050043;
@@ -1271,11 +1271,11 @@ containing a value of this type.
         public static final int abc_search_view=0x7f030016;
         public static final int abc_simple_decor=0x7f030017;
         public static final int activity_login=0x7f030018;
-        public static final int activity_main_screen=0x7f030019;
+        public static final int activity_main=0x7f030019;
         public static final int activity_reward_screen=0x7f03001a;
-        public static final int activity_setup=0x7f03001b;
-        public static final int activity_start_screen=0x7f03001c;
-        public static final int fragment_main_screen=0x7f03001d;
+        public static final int activity_scanner=0x7f03001b;
+        public static final int activity_setup=0x7f03001c;
+        public static final int activity_start_screen=0x7f03001d;
         public static final int fragment_reward_row=0x7f03001e;
         public static final int support_simple_spinner_dropdown_item=0x7f03001f;
     }

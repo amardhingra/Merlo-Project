@@ -1,19 +1,9 @@
-/*
- * Barebones implementation of displaying camera preview.
- * 
- * Created by lisah0 on 2012-02-24
- */
 package com.example.merloclient;
 
 import java.io.IOException;
 
-import android.app.Activity;
-import android.os.Bundle;
-
 import android.util.Log;
 
-import android.view.View;
-import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 
@@ -22,11 +12,11 @@ import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.AutoFocusCallback;
-import android.hardware.Camera.Parameters;
 
 /** A basic Camera preview class */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
-    private SurfaceHolder mHolder;
+    
+	private SurfaceHolder mHolder;
     private Camera mCamera;
     private PreviewCallback previewCallback;
     private AutoFocusCallback autoFocusCallback;
@@ -43,24 +33,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
          * Set camera to continuous focus if supported, otherwise use
          * software auto-focus. Only works for API level >=9.
          */
-        /*
-        Camera.Parameters parameters = camera.getParameters();
-        for (String f : parameters.getSupportedFocusModes()) {
-            if (f == Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) {
-                mCamera.setFocusMode(Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-                autoFocusCallback = null;
-                break;
-            }
-        }
-        */
 
         // Install a SurfaceHolder.Callback so we get notified when the
         // underlying surface is created and destroyed.
         mHolder = getHolder();
         mHolder.addCallback(this);
 
-        // deprecated setting, but required on Android versions prior to 3.0
-        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
     public void surfaceCreated(SurfaceHolder holder) {

@@ -28,19 +28,21 @@ public class HandleUser extends Thread {
 	Socket socket;
 	BufferedReader input;
 	PrintWriter output;
-	DBCollection users, sessionIDS, restaurants;
+	DBCollection users, sessionIDS, restaurants, cards;
 	MessageDigest hasher;
 	QRCodeWriter writer;
 	SessionID gen;
 
 	public HandleUser(Socket userSocket, DBCollection usersDB,
-			DBCollection sessionIDSDB, DBCollection restDB, MessageDigest hash) {
+			DBCollection sessionIDSDB, DBCollection restDB,
+			DBCollection cardsDB, MessageDigest hash) {
 
 		writer = new QRCodeWriter();
 		socket = userSocket;
 		this.users = usersDB;
 		this.sessionIDS = sessionIDSDB;
 		this.restaurants = restDB;
+		this.cards = cardsDB;
 		this.hasher = hash;
 		gen = new SessionID();
 
@@ -65,26 +67,25 @@ public class HandleUser extends Thread {
 			System.out.println(option);
 
 			/**
-			 * HANDLING SIGNUP REQUESTS
+			 * TODO:HANDLING SIGNUP REQUESTS
 			 */
 			if (option.equals("SIGNUP")) {
 
 				String username = input.readLine();
 				String password = input.readLine();
 				String emailID = input.readLine();
-
-				BasicDBObject usernameQuery = new BasicDBObject(User.USERNAME,
-						username);
-				BasicDBObject emailQuery = new BasicDBObject(User.EMAIL,
-						emailID);
-
+				/*
+				 * BasicDBObject usernameQuery = new
+				 * BasicDBObject(User.USERNAME, username); BasicDBObject
+				 * emailQuery = new BasicDBObject(User.EMAIL, emailID);
+				 */
 				// checking if the username has been taken
-				if (users.count(usernameQuery) != 0)
-					output.write("USERNAME_ERROR\nTAKEN\n");
+				if (users.count(new BasicDBObject(User.USERNAME, username)) != 0)
+					output.write("ERR\nUSERNAME\n");
 
 				// checking if the email id has been taken
-				else if (users.count(emailQuery) != 0)
-					output.write("EMAIL_ERROR\nTAKEN\n");
+				else if (users.count(new BasicDBObject(User.EMAIL, emailID)) != 0)
+					output.write("ERR\nEMAIL\n");
 
 				// if we've reached this point we have a valid new user
 				else {
@@ -97,14 +98,8 @@ public class HandleUser extends Thread {
 					saveSessionID(sessionID, username);
 
 					// creating a new mongoDB entry and saving the data
-					BasicDBObject newUser = new BasicDBObject();
-					newUser.put(User.USERNAME, username);
-					newUser.put(User.PASSWORD, hash(password));
-					newUser.put(User.EMAIL, emailID);
-					newUser.put(User.RESTAURANTS, new BasicDBObject());
-					newUser.put(User.USER_ID, uid);
-					newUser.put(User.RESTAURANT_LIST, new ArrayList<String>());
-					users.insert(newUser);
+					users.insert(new User(username, hash(password), emailID,
+							uid));
 
 					// sending the response back to the user
 					output.write("OK\n" + sessionID + "\n");
@@ -116,24 +111,20 @@ public class HandleUser extends Thread {
 
 					BufferedImage img = MatrixToImageWriter
 							.toBufferedImage(byteMatrix);
-					ImageIO.write(img, Const.QR_IMAGE_TYPE, new File("users/" + uid
-							+ ".png"));
-
-					// sending the user their QR code
-					ImageIO.write(img, "png", socket.getOutputStream());
+					ImageIO.write(img, Const.QR_IMAGE_TYPE, new File("users/"
+							+ uid + ".png"));
 
 				}
 			}
 
 			/**
-			 * HANDLING LOGIN REQUESTS
+			 * TODO: HANDLING LOGIN REQUESTS
 			 */
 			else if (option.equals("LOGIN")) {
 
 				// get the username and password
 				String username = input.readLine();
-				String password = input.readLine();
-				String qrNeeded = input.readLine();
+				String password = hash(input.readLine());
 
 				// getting a cursor to the user from the db
 				DBCursor userSearch = users.find(new BasicDBObject(
@@ -141,7 +132,7 @@ public class HandleUser extends Thread {
 
 				// checking if the username exists
 				if (userSearch.count() == 0) {
-					output.write("USERNAME_ERROR\nINVALID\n");
+					output.write("ERR\nUSERNAME\n");
 				}
 
 				else {
@@ -150,34 +141,23 @@ public class HandleUser extends Thread {
 					BasicDBObject user = (BasicDBObject) userSearch.next();
 
 					// checking the password matches the hashed password
-					if (((String) user.get(User.PASSWORD))
-							.equals(hash(password))) {
+					if (user.getString(User.PASSWORD).equals(password)) {
 
 						// generating a session ID and saving it
 						String sessionID = getUniqueSessionID();
 						saveSessionID(sessionID, username);
 						// sending the text data
-						output.write("OK\n" + sessionID + "\n"
-								+ getAllRestaurants(user));
+						output.write("OK\n" + sessionID + "\n");
 						output.flush();
-
-						// sending the qr code if required
-						if (qrNeeded.equals("CODE"))
-							ImageIO.write(
-									ImageIO.read(new File("users/"
-											+ user.get(User.USER_ID) + ".png")),
-									Const.QR_IMAGE_TYPE, socket.getOutputStream());
-					}
-
-					else
-						output.write("PASSWORD_ERROR\nINVALID\n");
+					} else
+						output.write("ERR\nPASSWORD\n");
 				}
 			}
 
 			else {
 
 				/**
-				 * VERIFYING USERS
+				 * TODO: VERIFYING USERS
 				 */
 
 				// if they aren't logging in or signing up we need to verify
@@ -197,70 +177,88 @@ public class HandleUser extends Thread {
 							new BasicDBObject(User.USERNAME, username)).next();
 
 					/**
-					 * USER WANTS ALL RESTAURANTS
+					 * TODO: ADDING A RESTAURANT TO THE USERS LIST OF
+					 * RESTAURANTS
 					 */
-					if (option.equals("FECTHALL"))
-						output.write(getAllRestaurants(user));
+					if (option.equals("FIND")) {
 
-					/**
-					 * ADDING A RESTAURANT TO THE USERS LIST OF RESTAURANTS
-					 */
-					// adding a restaurant to a users list
+						String query = input.readLine();
+						String response = "";
+
+						DBCursor c;
+						// if the user wants all blank query
+						if (query.equals("ALL")) {
+							c = restaurants.find();
+						} else {
+							// search for words which contain the phrase
+							c = restaurants.find(new BasicDBObject(Client.NAME,
+									new BasicDBObject("$regex", query)));
+						}
+						
+						// adding each name to the string
+						while (c.hasNext())
+							response += ((BasicDBObject) c.next())
+									.getString(Client.NAME) + ",";
+
+						System.out.println(response);
+
+						output.write("OK\n"
+								+ response.substring(0, response.length() - 1)
+								+ "\n");
+						output.flush();
+					}
+
+					// TODO: adding a restaurant to a users list
 					else if (option.equals("ADD")) {
 
 						// get the restaurant name
 						String restaurantName = input.readLine();
 
-						// checking if restaurant exists
-						if (restaurants.find(
-								new BasicDBObject("name", restaurantName))
-								.count() > 0) {
+						String userID = (String) users.findOne(
+								new BasicDBObject(User.USERNAME, username))
+								.get(User.USER_ID);
 
-							// updating the list of restaurants for the user
-							@SuppressWarnings("unchecked")
-							ArrayList<String> restList = (ArrayList<String>) user
-									.get(User.RESTAURANT_LIST);
-							restList.add(restaurantName);
+						String clientID = (String) restaurants.findOne(
+								new BasicDBObject(Client.NAME, restaurantName))
+								.get(Client.USER_ID);
 
-							user.put(User.RESTAURANT_LIST, restList);
+						Card nc = new Card(userID, clientID);
 
-							// creating and adding a new DBObject
-							// representing a restaurant
-							BasicDBObject userRests = (BasicDBObject) user
-									.get(User.RESTAURANTS);
-							userRests.put(restaurantName, new Integer(0));
-							user.put(User.RESTAURANTS, userRests);
-
-							// updating the user with the new information
-							users.update(
-									users.find(
-											new BasicDBObject(User.USERNAME,
-													username)).next(), user);
-
-							// sending acknowledgment
-							output.write("OK\n");
-							// ImageIO.write(
-							// ImageIO.read(new File("images/"
-							// + restaurantName + ".png")),
-							// QR_IMAGE_TYPE, socket.getOutputStream());
+						if (cards.find(nc).count() == 0) {
+							nc.put(Card.POINTS, 0);
+							nc.put(Card.LAST_VISITED, 0);
+							cards.insert(nc);
+							output.write("OK\n" + restaurantName);
+							output.flush();
 						}
 
-						else
-							output.write("INVALID\n");
-
+						else {
+							output.write("TAKEN\n" + restaurantName);
+							output.flush();
+						}
 					}
-
 					/**
-					 * SENDING THE USER THIER QRCODE
+					 * TODO: SENDING THE USER THIER QRCODE
 					 */
 					else if (option.equals("QR")) {
 
+						System.out.println("Sending QR");
+
 						// reading the image into a buffered image and
-						// writing
-						// it to the socket
-						BufferedImage image = ImageIO.read(new File("users/"
-								+ (String) user.get(User.USER_ID) + ".png"));
-						ImageIO.write(image, "png", socket.getOutputStream());
+						// writing it to the socket
+						String filePath = "users/"
+								+ (String) user.get(User.USER_ID) + ".png";
+
+						BufferedImage image;
+						boolean sent = false;
+						while (sent)
+							try {
+								image = ImageIO.read(new File(filePath));
+								ImageIO.write(image, "png",
+										socket.getOutputStream());
+								sent = true;
+							} catch (IOException e) {
+							}
 
 					}
 
@@ -293,10 +291,21 @@ public class HandleUser extends Thread {
 				DBCursor cursor = users.find();
 				while (cursor.hasNext())
 					System.out.println(cursor.next());
+
 				cursor = sessionIDS.find();
 				while (cursor.hasNext())
 					System.out.println(cursor.next());
+
+				System.out.println("CARDS");
+				cursor = cards.find();
+				while (cursor.hasNext())
+					System.out.println(cursor.next());
+
+				cursor = restaurants.find();
+				while (cursor.hasNext())
+					System.out.println(cursor.next());
 			}
+			System.out.println("Done");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -335,6 +344,10 @@ public class HandleUser extends Thread {
 	}
 
 	private void saveSessionID(String sessionID, String username) {
+
+		BasicDBObject userTokens = new BasicDBObject(User.SESSION_USERNAME,
+				username);
+		sessionIDS.findAndRemove(userTokens);
 
 		// saving the session ID
 		BasicDBObject sessionTok = new BasicDBObject();
@@ -406,7 +419,8 @@ public class HandleUser extends Thread {
 			String allRestaurants = restList.size() + "\n";
 
 			// get the group of restaurants
-			BasicDBObject restGroup = (BasicDBObject) user.get(User.RESTAURANTS);
+			BasicDBObject restGroup = (BasicDBObject) user
+					.get(User.RESTAURANTS);
 
 			// iterating through the list of restaurant names
 			for (String restaurant : restList) {

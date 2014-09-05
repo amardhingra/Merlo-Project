@@ -95,7 +95,7 @@ public class LoginActivity extends MySetupActivity implements
 		else{
 			
 			String message = usernameET.getText() + NL
-					+ passwordET + NL;
+					+ passwordET.getText() + NL;
 			
 			servConFragment.start("LOGIN", message);
 		}
@@ -149,14 +149,15 @@ public class LoginActivity extends MySetupActivity implements
 	public void forgotPassword(View v){}
 	
 	@Override
-	public void getResult(String messageType, String result) {
+	public void getResult(String messageType, String resultType, String result) {
 		
-		if (result.equals("OK")){
+		if (resultType.equals("OK")){
 			
+			setupPrefsEditor.putString("SESSION_ID", result);
 			setupPrefsEditor.putBoolean("LOGGED_IN", true);
 			setupPrefsEditor.apply();
 			
-			Intent mainScreen = new Intent(this, CameraTestActivity.class);
+			Intent mainScreen = new Intent(this, MainActivity.class);
 			startActivity(mainScreen, 1);
 			finish();
 			

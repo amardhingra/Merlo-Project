@@ -27,6 +27,7 @@ public class MerloServer {
 	DBCollection users;
 	DBCollection sessionIDS;
 	DBCollection restaurants;
+	DBCollection cards;
 
 	// hash code generator
 	MessageDigest hasher;
@@ -46,14 +47,20 @@ public class MerloServer {
 		users = database.getCollection("users");
 		sessionIDS = database.getCollection("sessionIDs");
 		restaurants = database.getCollection("restaurants");
-
+		cards = database.getCollection("cards");
+		
 		// emptying the databases if we are testing
 		if (DEBUG) {
-			users.drop();
-			sessionIDS.drop();
+			//users.drop();
+			//sessionIDS.drop();
 			restaurants.drop();
-		}
+			cards.drop();
+			
+			restaurants.insert(new Client("Milano", "2880 Broadway, New York NY", "milano", "jhb32784uhiuehr8q3nnj", "", "", null, "dkjsfnkjdkcbkjsdjkbdsj"));
+			restaurants.insert(new Client("Test", "2880 Broadway, New York NY", "milano", "a", "", "", null, "dkjsfnkjdkcbkjsdjkbdsj"));
 
+		}
+		
 		// attempts to create sockets
 		try {
 			userSocket = new ServerSocket(userPortNumber);
@@ -82,7 +89,7 @@ public class MerloServer {
 
 		public AcceptUserConnections(ServerSocket userSocket) {
 			sock = userSocket;
-			System.out.println("Waiting for user connections\n");
+			System.out.println("Waiting for user connections");
 		}
 
 		public void run() {
@@ -94,7 +101,7 @@ public class MerloServer {
 							+ incomingSocket.getInetAddress().toString() + " at "
 							+ new Date());
 					new HandleUser(incomingSocket, users, sessionIDS,
-							restaurants, hasher).start();
+							restaurants, cards, hasher).start();
 
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -110,7 +117,7 @@ public class MerloServer {
 
 		public AcceptClientConnections(ServerSocket clientSocket) {
 			sock = clientSocket;
-			System.out.println("Waiting for client connections\n" + sock.getLocalPort());
+			System.out.println("Waiting for client connections");
 		}
 
 		public void run() {
@@ -122,7 +129,7 @@ public class MerloServer {
 							+ incomingSocket.getInetAddress().toString() + " at "
 							+ new Date());
 					new HandleClient(incomingSocket, users, sessionIDS,
-							restaurants, hasher).start();
+							restaurants, cards, hasher).start();
 
 				} catch (IOException e) {
 					e.printStackTrace();
